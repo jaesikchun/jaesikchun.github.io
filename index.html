@@ -1,0 +1,87 @@
+<!--  Working with Data and APIs in JavaScript CH 1.4 and 1.5 -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>jsmap_1st</title>
+
+        <!-- css -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin=""/>
+
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+        
+
+        <style>
+            #jsmap {height:350px;}
+        </style>
+    </head>
+    <body>
+        <h1>
+            Test lat,lon
+        </h1>
+        <p> latitude: <span id='lat'></span><br/>
+            longitude: <span id='lon'></span><br/>
+        </p>
+
+        <div id="jsmap"></div>
+
+        <script>
+
+            // // MAP PART (Leaflet) // // 
+
+            // declare map object 
+            const mymap = L.map("jsmap").setView([51.505,-0.09],3);
+            // maptile from openstreet 
+            let osmaptile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
+            // add maptile to map layer 
+            osmaptile.addTo(mymap);            
+
+
+            // Drawing Part //
+
+            // custom marker setup
+            const custom = L.icon({
+                iconUrl: 'logo.png',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+            // setup marker 
+            const jmarker = L.marker([0,0], {icon: custom}).addTo(mymap);
+            
+
+            // // DATA PART (wheretheISS) // // 
+            const api_url = "https://api.wheretheiss.at/v1/satellites/25544";            
+            async function getpos() { 
+                // fetch API part 
+                const res = await fetch(api_url);
+                const injson = await res.json();
+                const {name, latitude,longitude} = injson;
+
+                console.log(injson);
+                console.log(latitude);
+                console.log(name);
+
+                document.getElementById('lat').textContent = latitude
+                document.getElementById('lon').textContent = longitude 
+
+                // setup view 
+                mymap.setView([latitude,longitude], 3);
+
+                // set marker position
+                jmarker.setLatLng([latitude,longitude])
+            };
+
+            // Update Map interval;
+            window.setInterval(getpos, 1000);
+
+        </script>
+    </body>
+</html> 
